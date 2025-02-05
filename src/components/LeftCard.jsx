@@ -19,7 +19,7 @@ function LeftCard() {
             <h1 className='text-3xl font-bold'>Hello,</h1>
             <div>
                 <h1 className='text-6xl font-extrabold tracking-wide'> {currentTime.getHours() > 10 ? currentTime.getHours() : `0${currentTime.getHours()}`}:{currentTime.getMinutes() > 10 ? currentTime.getMinutes() : `0${currentTime.getMinutes()}`} </h1>
-                <p className='text-lg font-light'>{(new Date).toLocaleDateString('en-US', { weekday: 'long' })}, {currentTime.getMonth() > 10 ? currentTime.getMonth() : `0${currentTime.getMonth()}`} {(new Date).toLocaleDateString("en-US", { month: "long" })} </p>
+                <p className='text-lg font-light'>{(new Date).toLocaleDateString('en-US', { weekday: 'long' })}, {currentTime.getMonth() > 10 ? currentTime.getDate() : `0${currentTime.getDate()}`} {(new Date).toLocaleDateString("en-US", { month: "long" })} </p>
             </div>
         </div>
     )
