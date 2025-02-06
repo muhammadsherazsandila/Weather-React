@@ -8,6 +8,7 @@ function Header({ fetchData }) {
     const [shadow, setShadow] = useState("shadow-[0px_2px_9px_1px_black] rounded-full bg-gray-800 hover:bg-gray-900 transition-all duration-200")
     const [check, setCheck] = useState(true)
     const [loading, setLoading] = useState("scale-0")
+    const [inputValue, setInputValue] = useState("")
     const enableLightMode = () => {
         setCheck(prveCheck => !prveCheck)
         setBgColor("bg-white")
@@ -34,6 +35,16 @@ function Header({ fetchData }) {
         setApiKey(import.meta.env.VITE_API_KEY)
     }, [])
 
+
+    const modifyInput = () => {
+    }
+
+    useEffect(() => {
+        const specialCharacters = "!@#$%^&*()_+-=[]{}|;:'\",.<>?/`~\\1234567890";
+        for (const element of specialCharacters) {
+            setCityName(prevIput => prevIput.split(element).join(""))
+        }
+    }, [cityName])
     return (
         <>
             <span className={`absolute left-0 top-0 bg-green-500 w-full py-0.5 ${loading} transition-all duration-500 origin-left`}></span>
@@ -44,9 +55,10 @@ function Header({ fetchData }) {
                         placeholder="Search City"
                         type="text"
                         value={cityName}
-                        onChange={(e) => { setCityName(e.target.value) }}
+                        onChange={(e) => { setCityName((e.target.value).trim()) }}
                         onKeyDown={(event) => {
                             if (event.key === "Enter") {
+                                modifyInput()
                                 fetchData(apiKey)
                                 setLoading("scale-100");
                                 setTimeout(() => {
@@ -59,6 +71,7 @@ function Header({ fetchData }) {
                         className={`px-5 py-2 cursor-pointer ${shadow}`}
                         type="button"
                         onClick={() => {
+                            modifyInput();
                             fetchData(apiKey); setLoading("scale-100"); setTimeout(() => {
                                 setLoading("scale-0")
                             }, 600);
