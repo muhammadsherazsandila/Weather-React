@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import MyContext from '../contexts/Mycontext'
+import axios from 'axios'
 
 function Header({ fetchData }) {
     const [apiKey, setApiKey] = useState("")
@@ -39,34 +40,51 @@ function Header({ fetchData }) {
     const modifyInput = () => {
     }
 
+    const [suggestionArr, setSuggestionArr] = useState([])
+    const [visibility, setVisibility] = useState("hidden")
+
     useEffect(() => {
         const specialCharacters = "!@#$%^&*()_+-=[]{}|;:'\",.<>?/`~\\1234567890";
         for (const element of specialCharacters) {
             setCityName(prevIput => prevIput.split(element).join(""))
         }
     }, [cityName])
+
+    const handleOnChange = async (event) => {
+        setCityName((event.target.value).trim())
+        let suggestedData = await axios.get(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&search=${cityName}`)
+        let suggestedArr = suggestedData.data[1];
+        setSuggestionArr([...suggestedArr])
+        setVisibility("block")
+    }
     return (
         <>
             <span className={`absolute left-0 top-0 bg-green-500 w-full py-0.5 ${loading} transition-all duration-500 origin-left`}></span>
             <header className="flex flex-col gap-2 md:flex-row items-center justify-between text-white p-4">
                 <div className="flex items-center gap-2 w-full md:w-auto mt-3 md:mt-0">
-                    <input
-                        className={`w-full md:w-64 px-4 py-2 rounded-full bg-gray-800 text-white placeholder-gray-400  outline-none ${shadow}`}
-                        placeholder="Search City"
-                        type="text"
-                        value={cityName}
-                        onChange={(e) => { setCityName((e.target.value).trim()) }}
-                        onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                                modifyInput()
-                                fetchData(apiKey)
-                                setLoading("scale-100");
-                                setTimeout(() => {
-                                    setLoading("scale-0")
-                                }, 600);
-                            }
-                        }}
-                    />
+                    <div className='relative'>
+                        <input
+                            className={`w-full md:w-64 px-4 py-2 rounded-full bg-gray-800 text-white placeholder-gray-400  outline-none ${shadow}`}
+                            placeholder="Search City"
+                            type="text"
+                            value={cityName}
+                            onChange={(event) => handleOnChange(event)}
+                            onKeyDown={(event) => {
+                                if (event.key === "Enter") {
+                                    modifyInput()
+                                    fetchData(apiKey)
+                                    setLoading("scale-100");
+                                    setTimeout(() => {
+                                        setLoading("scale-0")
+                                    }, 600);
+                                }
+                            }}
+                        />
+                        <ul className={`absolute ${visibility} left-0 top-10 w-64 border-none rounded-t-2xl -z-0 rounded-b-4xl shadow-[0px_1px_2px_1px_black] p-4 bg-gray-900`}> {suggestionArr.map(suges => (
+                            <li key={suges} className='cursor-pointer' onClick={(e) => { setCityName(suges); setVisibility("hidden") }}> {suges} </li>
+                        ))} </ul>
+
+                    </div>
                     <button
                         className={`px-5 py-2 cursor-pointer ${shadow}`}
                         type="button"
@@ -75,6 +93,7 @@ function Header({ fetchData }) {
                             fetchData(apiKey); setLoading("scale-100"); setTimeout(() => {
                                 setLoading("scale-0")
                             }, 600);
+                            setCityName("")
                         }}
                     >
                         Search
